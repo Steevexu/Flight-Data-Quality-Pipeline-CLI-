@@ -1,0 +1,5 @@
+flight_date,airline,flight_number,origin,dest,scheduled_dep,actual_dep,scheduled_arr,actual_arr,cancelled
+2026-02-01,AF,1234,CDG,NCE,08:10,08:25,09:45,10:02,0
+2026-02-01,AF,1235,NCE,CDG,11:20,11:18,12:55,12:48,0
+2026-02-02,EZY,0456,TLS,ORY,07:00,,08:20,,1
+2026-02-02,FR,7788,BOD,PMI,19:30,19:40,21:05,21:15,0
