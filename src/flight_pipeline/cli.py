@@ -44,6 +44,14 @@ def report(
     input: Path = typer.Option(..., "--input", "-i", exists=True, readable=True, help="Input Parquet file"),
     out: Path = typer.Option(Path("reports/quality_report.md"), "--out", "-o", help="Output Markdown report"),
     top: int = typer.Option(10, "--top", help="Top N airlines/routes"),
+    fail_if_cancelled_rate: float | None = typer.Option(
+        None, "--fail-if-cancelled-rate", help="Fail if cancelled rate is greater than this threshold (0..1)"
+    ),
+    fail_if_missing_actual_dep: float | None = typer.Option(
+        None,
+        "--fail-if-missing-actual-dep",
+        help="Fail if missing rate of actual_dep is greater than this threshold (0..1)",
+    ),
 ):
     """Generate a data quality report (console + Markdown)."""
     df = read_parquet(input)
@@ -74,11 +82,35 @@ def report(
         table3.add_row(route, str(c))
     console.print(table3)
 
-    # Markdown report
+    # Markdown report (always generated)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_markdown(r), encoding="utf-8")
     console.print(Panel(f"✅ Report generated: {out}", title="Success"))
 
+    # -----------------------------
+    # Quality Gate
+    # -----------------------------
+    gate_failures: list[str] = []
+
+    if fail_if_cancelled_rate is not None and r.cancelled_rate > fail_if_cancelled_rate:
+        gate_failures.append(
+            f"Cancelled rate {r.cancelled_rate:.2%} > threshold {fail_if_cancelled_rate:.2%}"
+        )
+
+    missing_actual_dep = r.missing_rates.get("actual_dep")
+    if fail_if_missing_actual_dep is not None and missing_actual_dep is not None:
+        if missing_actual_dep > fail_if_missing_actual_dep:
+            gate_failures.append(
+                f"Missing actual_dep {missing_actual_dep:.2%} > threshold {fail_if_missing_actual_dep:.2%}"
+            )
+
+    if gate_failures:
+        console.print("[red][bold]QUALITY GATE FAILED[/bold][/red]")
+        for msg in gate_failures:
+            console.print(f"[red]- {msg}[/red]")
+        raise typer.Exit(code=2)
+    else:
+        console.print("[green][bold]QUALITY GATE PASSED[/bold][/green]")
 
 if __name__ == "__main__":
     app()
