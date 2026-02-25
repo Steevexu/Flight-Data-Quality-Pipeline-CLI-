@@ -1,26 +1,15 @@
-# Python
+.venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 .pytest_cache/
-
-# Virtual env
-.venv/
-
-# Build
 build/
 dist/
 *.egg-info/
-
-# Generated data
 data/processed/
 reports/
-
-# IDE
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db
+data/processed/
+reports/

@@ -1,0 +1,7 @@
+services:
+  flight-pipeline:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    working_dir: /app
