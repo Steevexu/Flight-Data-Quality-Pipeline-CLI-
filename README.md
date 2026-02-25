@@ -1,19 +1,36 @@
 # ✈️ Flight Data Quality Pipeline (CLI)
 
-A production-style data engineering mini-project: ingest flight data (CSV), validate it with **Pandera**, export to **Parquet**, and generate a **data quality report** with an optional **quality gate** (fail the pipeline if thresholds are exceeded).
+A production-style **Data Engineering mini-project**.
+
+This project ingests flight data (CSV), cleans and validates it using **Pandera**, exports it to **Parquet**, and generates a **data quality report** with an optional **quality gate** that can fail the pipeline.
 
 ---
 
-## ✅ Key Features
+## 🧠 Why This Project?
 
-- **Ingest** CSV flight data
-- **Clean & standardize** (string normalization, null handling)
-- **Validate** schema + business rules with **Pandera**
-- **Export** clean dataset to **Parquet**
-- **Report** quality metrics (missing rates, top airlines/routes)
-- **Quality Gate**: fail with non-zero exit code if thresholds are exceeded
-- **Tests** with Pytest
-- **CI** with GitHub Actions
+This project demonstrates key Data Engineering concepts:
+
+- Schema validation & data contracts (Pandera)
+- Batch processing pipeline (CSV → Clean → Validate → Parquet)
+- Data quality monitoring
+- Quality gate with non-zero exit codes (CI/CD ready)
+- Automated testing (Pytest)
+- Dockerized execution
+- CI with GitHub Actions
+
+---
+
+## 🏗 Architecture
+
+CSV Input
+↓
+Cleaning & Standardization
+↓
+Schema Validation (Pandera)
+↓
+Parquet Export
+↓
+Quality Report + Optional Quality Gate
 
 ---
 
@@ -22,18 +39,24 @@ A production-style data engineering mini-project: ingest flight data (CSV), vali
 ```text
 Flight-Data-Quality-Pipeline-CLI/
 ├── src/flight_pipeline/
-│   ├── cli.py
-│   ├── schema.py
-│   ├── transform.py
-│   ├── quality.py
-│   └── io.py
+│ ├── cli.py # CLI interface (Typer)
+│ ├── schema.py # Pandera validation schema
+│ ├── transform.py # Cleaning & normalization
+│ ├── quality.py # Data quality metrics
+│ └── io.py # CSV / Parquet I/O
 ├── tests/
 ├── data/raw/flights_sample.csv
+├── Dockerfile
+├── docker-compose.yml
 ├── pyproject.toml
 └── .github/workflows/ci.yml
 ```
 
-## 📦 Installation
+---
+
+## 🚀 Run Locally
+
+### 1️⃣ Create virtual environment
 
 ```bash
 python -m venv .venv
@@ -46,21 +69,24 @@ pip install -U pip
 pip install -e .
 ```
 
-## 🚀 Usage
-
-1) Run pipeline (CSV → Parquet)
+### 2️⃣ Run pipeline
 
 ```bash
-python -m flight_pipeline.cli run -i data/raw/flights_sample.csv -o data/processed/flights.parquet
+python -m flight_pipeline.cli run \
+  -i data/raw/flights_sample.csv \
+  -o data/processed/flights.parquet
 ```
 
-2) Generate quality report (console + Markdown)
+### 3️⃣ Generate quality report
 
 ```bash
-python -m flight_pipeline.cli report -i data/processed/flights.parquet -o reports/quality_report.md
+python -m flight_pipeline.cli report \
+  -i data/processed/flights.parquet \
+  -o reports/quality_report.md
 ```
 
-3) Quality gate (fail if quality is below threshold)
+## 🚦 Quality Gate (CI/CD Ready)
+Fail the pipeline if data quality thresholds are exceeded:
 
 ```bash
 python -m flight_pipeline.cli report \
@@ -74,7 +100,42 @@ python -m flight_pipeline.cli report \
 ```bash
 python -m pytest -vv
 ```
+Test coverage includes:
+- Schema validation
+- Cleaning logic
+- Quality metrics
+- Quality gate behavior
 
+## 🐳 Run with Docker
+
+Build:
+```bash
+docker compose build
+```
+Run pipeline:
+```bash
+docker compose run --rm flight-pipeline run \
+  -i data/raw/flights_sample.csv \
+  -o data/processed/flights.parquet
+```
+Generate report:
+```bash
+docker compose run --rm flight-pipeline report \
+  -i data/processed/flights.parquet \
+  -o reports/quality_report.md
+```
 ## 🔄 Continuous Integration
 
-GitHub Actions runs the test suite automatically on each push and pull request.
+GitHub Actions automatically runs the test suite on every push and pull request.
+
+Add CI badge:
+```code
+![CI](https://github.com/USERNAME/REPO/actions/workflows/ci.yml/badge.svg)
+```
+
+## 📈 Potential Improvements
+
+- Partitioned Parquet output (data lake style)
+- JSON metrics export for monitoring systems
+- Airflow orchestration example
+- Integration with object storage (S3-compatible)
